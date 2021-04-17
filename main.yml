@@ -1,0 +1,59 @@
+- hosts: localhost
+  vars_files:
+  - secure.yml
+  vars_prompt: 
+  - name: kubeNodes
+    prompt: Number of kubernetes workers want to Launch in AWS?
+    private: false
+    
+  pre_tasks:
+  - name: Provisioning Kube-Master in AWS
+    ec2:
+      instance_tags:
+        Name: KubeMaster 
+      key_name: "keypair_docker_webserver"
+      instance_type: "t2.small"
+      image: "ami-0a9d27a9f4f5c0efc"
+      wait: yes
+      count: 1 
+      vpc_subnet_id: "subnet-9e9fa5f6"
+      assign_public_ip: yes
+      state: present
+      region: "ap-south-1"
+      group_id: "sg-02548637202b85d22"
+      aws_access_key: "{{ access_key }}"
+      aws_secret_key: "{{ secret_key }}"
+    when: false
+  - name: Provision Kube-Worker in AWS
+    ec2:
+      instance_tags:
+        Name: KubeWorker
+      key_name: "keypair_docker_webserver"
+      instance_type: "t2.micro"
+      image: "ami-0a9d27a9f4f5c0efc"
+      wait: yes
+      count: "{{ kubeNodes }}"
+      vpc_subnet_id: "subnet-9e9fa5f6"
+      assign_public_ip: yes
+      state: present
+      region: "ap-south-1"
+      group_id: "sg-02548637202b85d22"
+      aws_access_key: "{{ access_key }}"
+      aws_secret_key: "{{ secret_key }}"
+    when: false
+  - name: Wait to Completely Provision Instances
+    pause:
+      minutes: 2
+    when: false
+  - name: Refresh Inventory
+    meta: refresh_inventory
+
+- hosts: tag_Name_KubeMaster
+  roles: 
+  - role: kube-master
+- hosts: tag_Name_KubeWorker
+  roles:
+  - role: kube-node
+            
+
+
