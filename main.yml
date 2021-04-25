@@ -55,13 +55,12 @@
       group_id: "sg-02548637202b85d22"
       aws_access_key: "{{ access_key }}"
       aws_secret_key: "{{ secret_key }}"
-
+    when: false
   - name: Wait to Completely Provision Instances
     pause:
       minutes: 2
-    when: false
-  #  - name: Refresh Inventory
-  #meta: refresh_inventory
+  - name: Refresh Inventory
+    meta: refresh_inventory
 
 - hosts: tag_Name_KubeMaster
   roles: 
