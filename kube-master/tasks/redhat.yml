@@ -64,7 +64,7 @@
     shell: sysctl --system
 
   - name: Initializing Cluster...
-    command: kubeadm init --pod-network-cidr={{ clusterNetwork }} --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem
+    command: kubeadm init --pod-network-cidr=10.240.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem
 
   - name: Generating Join Command and Token...
     command: kubeadm token create  --print-join-command
@@ -85,7 +85,6 @@
     file:
       path: $HOME/.kube
       state: directory
-      mode: '0755'
   - name: Command to get the public IP address
     command: curl ifconfig.me 
     register: public_ip
@@ -97,12 +96,14 @@
       force: yes
       remote_src: yes
   
-  - name: Change kubeconfig file permission
-    file:
-      path: $HOME/.kube/config 
-      owner: "{{ ansible_effective_user_id }}"
-      group: "{{ ansible_effective_group_id }}"
-  
+      #  - name: Change kubeconfig file permission
+      #file:
+      #path: $HOME/.kube/config 
+      #owner: "{{ ansible_effective_user_id }}"
+      #group: "{{ ansible_effective_group_id }}"
+  - name: changing owner permission
+    shell: "chown $(id -u):$(id -g) $HOME/.kube/config"
+
   - name: Setting up Flannel...
     command:  kubectl apply  -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
     ignore_errors: yes
