@@ -1,0 +1,13 @@
+---
+# tasks file for wordpress-deploy
+
+  - name: copy wordpress manifest files to kube-master
+    copy:
+      src: wordpress
+      dest: /root
+      #when: false
+
+  - name: Deploy wordpress on Kubernetes
+    shell: kubectl apply -k /root/wordpress
+    #when: false
+

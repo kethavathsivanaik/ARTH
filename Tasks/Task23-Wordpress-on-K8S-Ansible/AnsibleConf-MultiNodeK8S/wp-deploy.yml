@@ -1,0 +1,4 @@
+- hosts: tag_Name_KubeMaster
+  roles:
+  - role: wordpress-deploy
+
